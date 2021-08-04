@@ -1,0 +1,28 @@
+USE `DemoDB`;
+ 
+-- Normal sub query and if you observe the subquery output is static 
+-- i.e. it just returns the HR department ID and the same value could 
+-- be used for the entire outer query.
+-- it is almost like select * from Employee where DeptID = 3;
+ 
+select * from Employee where DeptId = (select DeptId from Dept where Name = 'HR');
+ 
+-- Translation of above query using correlated subquery.
+ 
+-- In case of this query the reference to e.DeptId is made which is an outer
+-- query column. And this column value changes for each record in the Employee table
+-- and hence the subquery need to be evaluated for each record. And this is slightly 
+-- in efficient.
+ 
+-- Here it the inner query check for the existence of a record with employees departmentId
+-- whose name is HR. If record exists then Employee record is selected otherwise not.
+ 
+select * from Employee as e
+where 
+exists (select * from Dept where DeptId = e.DeptId and Name = 'HR');
+ 
+-- Translation using JOIN.
+-- Most of the times JOIN might turns out to be a better option.
+ 
+select e.* from Employee as e
+INNER JOIN Dept as d ON (e.DeptId = d.DeptId and d.Name = 'HR');
